@@ -227,7 +227,7 @@ def plot_roc(pm, title='AUC-plot', image_path=None):
     plt.close()
 
 
-def plot_pr(pm, title="PR-plot", image_path=None):
+def plot_pr(pm, title='PR-plot', image_path=None):
     fig, ax = plt.subplots()
     plt.plot(pm['recall'], pm['precision'], color='black', linewidth=0.5)
     plt.xlabel('recall')

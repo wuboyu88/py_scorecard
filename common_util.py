@@ -411,7 +411,7 @@ def onecombine(y, var, varindex, special_value=None, break_type=1, bin_rate_min=
     :param good_value:
     :param num_bins:
     :param replace_value:
-    :param comb_type: str, "combinning" or "decreasing"
+    :param comb_type: str, 'combinning' or 'decreasing'
     :param closed_on_right:
     :return:
     """

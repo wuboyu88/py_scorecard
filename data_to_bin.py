@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 def dtob(path, data=None, y_label=None, special_value=None, exclude=None, bestks_k=0, break_type=1, bin_rate_min=0.05,
          train_perc=0.7, sv_perc=0.8, num_bins=10, min_num_bins=3, max_num_bins=10, bad_value=1, closed_on_right=True,
-         good_value=0, replace_value=1, comb_type="combinning", woe_stand="monotonous", seed=1234):
+         good_value=0, replace_value=1, comb_type='combinning', woe_stand='monotonous', seed=1234):
     """
     数据转分箱
     :param path:
@@ -59,7 +59,7 @@ def dtob(path, data=None, y_label=None, special_value=None, exclude=None, bestks
         sinvar = single_var_name(data[data.columns.difference([y_label] + exclude)], sv_perc=sv_perc)
 
         if len(sinvar) > 0:
-            print("End single value screening: removed {} columns, they are {}".format(len(sinvar), ','.join(sinvar)))
+            print('End single value screening: removed {} columns, they are {}'.format(len(sinvar), ','.join(sinvar)))
         data = data[[ele for ele in data.columns if ele not in sinvar]]
 
         if len(data.columns.difference([y_label] + exclude)) == 0:

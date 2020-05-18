@@ -8,7 +8,7 @@ t = datetime.now().strftime('%Y%m%d%H%M%S') if t is None else t
 if not os.path.exists('model_result//wuboyu_modelresult_{}'.format(t)):
     os.makedirs('model_result//wuboyu_modelresult_{}'.format(t))
 path = 'model_result//wuboyu_modelresult_{}//test{}'.format(t, t)
-data = pd.read_csv('data2.csv')
+data = pd.read_csv('all_data//data.csv')
 
 y_label = 'Creditability'
 special_value = [-9999, -1111]  # 特殊值
@@ -25,8 +25,8 @@ bad_value = 1  # 坏人的标志
 closed_on_right = True
 good_value = 0  # 好人的标志
 replace_value = 1
-comb_type = "combinning"
-woe_stand = "monotonous"
+comb_type = 'combinning'
+woe_stand = 'monotonous'
 seed = 1234  # 随机种子
 sample_weights = [1, 1]
 p_min = 0.05
