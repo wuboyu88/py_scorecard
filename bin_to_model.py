@@ -413,7 +413,7 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
                                          'good.perc.allgood.acc', 'bad.perc.allbad.acc', 'ks']]
 
     print('computing train_woematrix corr')
-    train_corr = train_woematrix.corr()
+    train_corr = train_woematrix.corr(method='spearman')
     train_pm = perfm(traindata[y_label], train_scorematrix['p'])
 
     # 计算整理测试集信息
@@ -441,7 +441,7 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
          'good.perc.allgood.acc', 'bad.perc.allbad.acc', 'ks']]
 
     print('computing test_woematrix corr')
-    test_corr = test_woematrix.corr()
+    test_corr = test_woematrix.corr(method='spearman')
     test_pm = perfm(testdata[y_label], test_scorematrix['p'])
 
     # 保存信息到_btom.xlsx
