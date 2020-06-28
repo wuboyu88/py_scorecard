@@ -343,8 +343,8 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
     test_index = deepcopy(info_data_to_bin['test_index'])
     traindata = deepcopy(info_data_to_bin['traindata'])
     testdata = deepcopy(info_data_to_bin['testdata'])
-    traindataother = deepcopy(info_data_to_bin['traindataother'])
-    testdataother = deepcopy(info_data_to_bin['testdataother'])
+    # traindataother = deepcopy(info_data_to_bin['traindataother'])
+    # testdataother = deepcopy(info_data_to_bin['testdataother'])
 
     # 根据IV值筛选
     print('For {} variables start screening by IV'.format(len(train_index)))
@@ -397,12 +397,12 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
     print('computing train_samples score')
     train_scorematrix = dtos(traindata, scorecard)
     train_scorematrix['score'] = train_scorematrix.sum(axis=1)
-    train_scorematrix = pd.concat([traindataother, train_scorematrix], axis=1)
+    # train_scorematrix = pd.concat([traindataother, train_scorematrix], axis=1)
     print('computing train_samples p_value')
 
     # 根据训练集预测p值
     train_scorematrix['p'] = glm_fit.predict(train_woematrix)
-    train_woematrix = pd.concat([traindataother, train_woematrix], axis=1)
+    # train_woematrix = pd.concat([traindataother, train_woematrix], axis=1)
 
     # 训练集总分分箱信息计算
     train_score_info = binning(y=traindata.iloc[:, 0], var=train_scorematrix['score'], break_type=1, num_bins=score_k)[
@@ -423,12 +423,12 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
     print('computing test_samples score')
     test_scorematrix = dtos(testdata, scorecard)
     test_scorematrix['score'] = test_scorematrix.sum(axis=1)
-    test_scorematrix = pd.concat([testdataother, test_scorematrix], axis=1)
+    # test_scorematrix = pd.concat([testdataother, test_scorematrix], axis=1)
 
     # 根据训练集预测p值
     print('computing test_samples p_value')
     test_scorematrix['p'] = glm_fit.predict(test_woematrix)
-    test_woematrix = pd.concat([testdataother, test_woematrix], axis=1)
+    # test_woematrix = pd.concat([testdataother, test_woematrix], axis=1)
 
     # 测试集总分分箱信息计算
     train_score_info_breakpoints[0] = -np.Inf
