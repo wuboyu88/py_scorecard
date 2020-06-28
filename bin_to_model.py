@@ -515,3 +515,6 @@ def btom(path, info_data_to_bin, corr_t=0.8, seed=1234, iv_min=0.02, iv_max=100,
     image_path = '{}_{}.png'.format(path, title)
     plot_ks(test_score_info, title=title, image_path=image_path)
     insert_image_to_excel('{}_btom.xlsx'.format(path), 'test_score_info', image_path, anchor='A45')
+
+    # 入模变量和模型
+    return name, glm_fit
