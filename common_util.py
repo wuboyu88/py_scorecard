@@ -493,7 +493,7 @@ def finalvarindex(y, var, bad_value=1, good_value=0, num_bins=10, min_num_bins=3
 
 def allvarindex(datax, y, bad_value=1, good_value=0, num_bins=10, min_num_bins=3, max_num_bins=10, bestks_k=0,
                 special_value=None, bin_rate_min=0, replace_value=1, break_type=1, comb_type='combinning',
-                woe_stand='monotonous', closed_on_right=True):
+                woe_stand='monotonous', closed_on_right=True, manuel_breakpoints_dict=None):
     """
     训练集全部变量分箱
     :param datax:
@@ -511,14 +511,17 @@ def allvarindex(datax, y, bad_value=1, good_value=0, num_bins=10, min_num_bins=3
     :param comb_type:
     :param woe_stand:
     :param closed_on_right:
+    :param manuel_breakpoints_dict
     :return:
     """
     special_value = [] if special_value is None else special_value
+    manuel_breakpoints_dict = dict() if manuel_breakpoints_dict is None else manuel_breakpoints_dict
     var_index = dict()
     for ele in datax.columns:
         var = datax[ele]
+        breakpoints = manuel_breakpoints_dict.get(ele)
         var_index[ele] = finalvarindex(y=y, var=var, bad_value=bad_value, good_value=good_value, num_bins=num_bins,
-                                       min_num_bins=min_num_bins, max_num_bins=max_num_bins, breakpoints=None,
+                                       min_num_bins=min_num_bins, max_num_bins=max_num_bins, breakpoints=breakpoints,
                                        bestks_k=bestks_k, special_value=special_value, break_type=break_type,
                                        bin_rate_min=bin_rate_min, replace_value=replace_value, comb_type=comb_type,
                                        woe_stand=woe_stand, closed_on_right=closed_on_right)

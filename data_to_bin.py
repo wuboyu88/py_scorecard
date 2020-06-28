@@ -6,7 +6,8 @@ from sklearn.model_selection import train_test_split
 
 def dtob(path, data=None, y_label=None, special_value=None, exclude=None, bestks_k=0, break_type=1, bin_rate_min=0.05,
          train_perc=0.7, sv_perc=0.8, num_bins=10, min_num_bins=3, max_num_bins=10, bad_value=1, closed_on_right=True,
-         good_value=0, replace_value=1, comb_type='combinning', woe_stand='monotonous', seed=1234):
+         good_value=0, replace_value=1, comb_type='combinning', woe_stand='monotonous', seed=1234,
+         manuel_breakpoints_dict=None):
     """
     数据转分箱
     :param path:
@@ -29,9 +30,11 @@ def dtob(path, data=None, y_label=None, special_value=None, exclude=None, bestks
     :param comb_type:
     :param woe_stand:
     :param seed:
+    :param manuel_breakpoints_dict:
     :return:
     """
     exclude = [] if exclude is None else exclude
+    manuel_breakpoints_dict = dict() if manuel_breakpoints_dict is None else manuel_breakpoints_dict
 
     # 环境准备
     print('Data to bin start at {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -96,7 +99,8 @@ def dtob(path, data=None, y_label=None, special_value=None, exclude=None, bestks
                               good_value=good_value, num_bins=num_bins, min_num_bins=min_num_bins,
                               max_num_bins=max_num_bins, bestks_k=bestks_k, special_value=special_value,
                               bin_rate_min=bin_rate_min, replace_value=replace_value, break_type=break_type,
-                              comb_type=comb_type, woe_stand=woe_stand, closed_on_right=closed_on_right)
+                              comb_type=comb_type, woe_stand=woe_stand, closed_on_right=closed_on_right,
+                              manuel_breakpoints_dict=manuel_breakpoints_dict)
 
     # 整理训练集信息
     print('summary traininfo')

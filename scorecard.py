@@ -37,7 +37,9 @@ iv_max = 100
 score_k = 10
 theta = None
 corr_t = 0.8
+manuel_breakpoints_dict = None
+# manuel_breakpoints_dict = {'AccountBalance': [1, 1.9, 3.1, 4]}  # 其中1和4分别为训练集的最小值和最大值
 
 dtom(path, data, y_label, special_value, exclude, bestks_k, break_type, bin_rate_min, train_perc, sv_perc, num_bins,
      min_num_bins, max_num_bins, bad_value, closed_on_right, good_value, replace_value, comb_type, woe_stand, seed,
-     corr_t, iv_min, iv_max, p0, sample_weights, score_k, p_min, theta, pdo)
+     corr_t, iv_min, iv_max, p0, sample_weights, score_k, p_min, theta, pdo, manuel_breakpoints_dict)
