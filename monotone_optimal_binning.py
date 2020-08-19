@@ -144,8 +144,7 @@ class Binning(BaseEstimator, TransformerMixin):
             summary["z_value"] = (summary["means"] - summary["means_lead"]) / np.sqrt(
                 summary["est_std_dev2"] * (1 / summary["nsamples"] + 1 / summary["nsamples_lead"]))
 
-            summary["p_value"] = 1 - stats.norm.cdf(summary["z_value"])
-
+            summary["p_value"] = stats.t.sf(summary["z_value"], summary["est_nsamples"] - 2)
             # 1.如果单箱样本数小于给定值
             # 2.如果单项坏样本数小于给定值
             # 对于上述两种情况均需要合箱操作
