@@ -186,9 +186,9 @@ class Binning(BaseEstimator, TransformerMixin):
         woe_summary["dist_good"] = woe_summary["goods"] / total_goods
         woe_summary["dist_bad"] = woe_summary["bads"] / total_bads
 
-        woe_summary["WOE_" + self.column] = np.log(woe_summary["dist_good"] / woe_summary["dist_bad"])
+        woe_summary["WOE_" + self.column] = np.log(woe_summary["dist_bad"] / woe_summary["dist_good"])
 
-        woe_summary["IV_components"] = (woe_summary["dist_good"] - woe_summary["dist_bad"]) * woe_summary[
+        woe_summary["IV_components"] = (woe_summary["dist_bad"] - woe_summary["dist_good"]) * woe_summary[
             "WOE_" + self.column]
 
         self.total_iv = np.sum(woe_summary["IV_components"])
