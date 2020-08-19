@@ -468,7 +468,10 @@ def finalvarindex(y, var, bad_value=1, good_value=0, num_bins=10, min_num_bins=3
     binwoe = deepcopy(varindex['card']['woe'])
     binwoe = binwoe.iloc[len(special_value):]
 
-    if woe_stand == 'monotonous':
+    if breakpoints is not None:
+        return varindex
+
+    elif woe_stand == 'monotonous':
         while (len(binwoe) > min_num_bins and (not is_monotonous(binwoe))) or len(binwoe) > max_num_bins:
             varindex = onecombine(y, var, varindex, special_value=special_value, break_type=break_type,
                                   bin_rate_min=bin_rate_min, bad_value=bad_value, good_value=good_value,
