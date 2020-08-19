@@ -2,6 +2,7 @@ from data_to_model import dtom
 import pandas as pd
 from datetime import datetime
 import os
+from monotone_optimal_binning import Binning
 
 t = '20200511143436'
 t = datetime.now().strftime('%Y%m%d%H%M%S') if t is None else t
@@ -38,6 +39,24 @@ score_k = 10
 theta = None
 corr_t = 0.8
 manuel_breakpoints_dict = None
+
+var = "Age"  # variable to be binned
+train = pd.read_csv("all_data//traindata.csv")
+bin_object = Binning(y_label, n_threshold=train.shape[0] * 0.05, y_threshold=1, p_threshold=1, sign=False)
+bin_object.fit(train[[y_label, var]])
+
+# Print bin summary
+print(bin_object.bin_summary)
+
+# Print pvalue summary
+print(bin_object.pvalue_summary)
+
+# Print WOE summary
+print(bin_object.woe_summary)
+
+# The bin cut-points in an array
+print(bin_object.bins)
+
 # manuel_breakpoints_dict = {'AccountBalance': [1, 1.9, 3.1, 4]}  # 其中1和4分别为训练集的最小值和最大值
 
 dtom(path, data, y_label, special_value, exclude, bestks_k, break_type, bin_rate_min, train_perc, sv_perc, num_bins,
