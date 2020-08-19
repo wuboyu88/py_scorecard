@@ -200,17 +200,13 @@ class Binning(BaseEstimator, TransformerMixin):
         return pd.Interval(left, right)
 
     def generate_final_dataset(self):
-        if not self.sign:
-            shift_var = -1
-            self.bucket = True
-        else:
-            shift_var = 1
-            self.bucket = False
+        shift_var = -1
+        self.bucket = True
 
         self.woe_summary[self.column + "_shift"] = self.woe_summary[self.column].shift(shift_var)
 
         if self.sign:
-            self.woe_summary.loc[0, self.column + "_shift"] = np.inf
+            self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = np.inf
             self.bins = np.sort(list(self.woe_summary[self.column]) + [np.Inf, -np.Inf])
         else:
             self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = -np.inf
