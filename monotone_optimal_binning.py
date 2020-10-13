@@ -32,7 +32,7 @@ os.getcwd()
 
 class Binning(BaseEstimator, TransformerMixin):
 
-    def __init__(self, y, n_threshold, y_threshold=1, p_threshold=1, sign=False):
+    def __init__(self, y, n_threshold, y_threshold=1, p_threshold=1, sign=False, closed='right'):
         """
         # 如果不管怎么分箱都是不单调的，那么就会只分一箱
         :param y: 标签列
@@ -56,7 +56,8 @@ class Binning(BaseEstimator, TransformerMixin):
         self.column = None
         self.total_iv = None
         self.bins = None
-        self.bucket = None
+        self.closed = closed
+        self.bucket = True if closed == 'right' else False
 
     def generate_summary(self):
 
@@ -71,7 +72,7 @@ class Binning(BaseEstimator, TransformerMixin):
         self.init_summary["del_flag"] = 0
         self.init_summary["std_dev"] = self.init_summary["std_dev"].fillna(0)
 
-        self.init_summary = self.init_summary.sort_values([self.column], ascending=self.sign)
+        self.init_summary = self.init_summary.sort_values([self.column], ascending=not self.bucket)
 
     def combine_bins(self):
         summary = self.init_summary.copy()
@@ -80,47 +81,90 @@ class Binning(BaseEstimator, TransformerMixin):
             i = 0
             summary = summary[summary.del_flag != 1]
             summary = summary.reset_index(drop=True)
-            while True:
+            if (self.bucket and self.sign) or (not self.bucket and not self.sign):
+                while True:
 
-                j = i + 1
+                    j = i + 1
 
-                if j >= len(summary):
+                    if j >= len(summary):
+                        break
+
+                    if summary.iloc[j].means > summary.iloc[i].means:
+                        i = i + 1
+                        continue
+                    else:
+                        while True:
+                            n = summary.iloc[j].nsamples + summary.iloc[i].nsamples
+                            m = (summary.iloc[j].nsamples * summary.iloc[j].means +
+                                 summary.iloc[i].nsamples * summary.iloc[i].means) / n
+
+                            if n == 2:
+                                s = np.std([summary.iloc[j].means, summary.iloc[i].means])
+                            else:
+                                # 参考https://stats.stackexchange.com/questions/55999/is-it-possible-to-find-the-combined-standard-deviation
+                                s = np.sqrt(((summary.iloc[j].nsamples - 1) * (summary.iloc[j].std_dev ** 2) +
+                                             (summary.iloc[i].nsamples - 1) * (summary.iloc[i].std_dev ** 2) +
+                                             summary.iloc[j].nsamples * (m - summary.iloc[j].means) ** 2 +
+                                             summary.iloc[i].nsamples * (m - summary.iloc[i].means) ** 2) / (n - 1))
+
+                            summary.loc[i, "nsamples"] = n
+                            summary.loc[i, "means"] = m
+                            summary.loc[i, "std_dev"] = s
+                            summary.loc[j, "del_flag"] = 1
+
+                            j = j + 1
+                            if j >= len(summary):
+                                break
+                            if summary.loc[j, "means"] > summary.loc[i, "means"]:
+                                i = j
+                                break
+                    if j >= len(summary):
+                        break
+                dels = np.sum(summary["del_flag"])
+                if dels == 0:
                     break
+            else:
+                while True:
 
-                if summary.iloc[j].means < summary.iloc[i].means:
-                    i = i + 1
-                    continue
-                else:
-                    while True:
-                        n = summary.iloc[j].nsamples + summary.iloc[i].nsamples
-                        m = (summary.iloc[j].nsamples * summary.iloc[j].means +
-                             summary.iloc[i].nsamples * summary.iloc[i].means) / n
+                    j = i + 1
 
-                        if n == 2:
-                            s = np.std([summary.iloc[j].means, summary.iloc[i].means])
-                        else:
-                            # 参考https://stats.stackexchange.com/questions/55999/is-it-possible-to-find-the-combined-standard-deviation
-                            s = np.sqrt(((summary.iloc[j].nsamples - 1) * (summary.iloc[j].std_dev ** 2) +
-                                         (summary.iloc[i].nsamples - 1) * (summary.iloc[i].std_dev ** 2) +
-                                         summary.iloc[j].nsamples * (m - summary.iloc[j].means) ** 2 +
-                                         summary.iloc[i].nsamples * (m - summary.iloc[i].means) ** 2) / (n - 1))
+                    if j >= len(summary):
+                        break
 
-                        summary.loc[i, "nsamples"] = n
-                        summary.loc[i, "means"] = m
-                        summary.loc[i, "std_dev"] = s
-                        summary.loc[j, "del_flag"] = 1
+                    if summary.iloc[j].means < summary.iloc[i].means:
+                        i = i + 1
+                        continue
+                    else:
+                        while True:
+                            n = summary.iloc[j].nsamples + summary.iloc[i].nsamples
+                            m = (summary.iloc[j].nsamples * summary.iloc[j].means +
+                                 summary.iloc[i].nsamples * summary.iloc[i].means) / n
 
-                        j = j + 1
-                        if j >= len(summary):
-                            break
-                        if summary.loc[j, "means"] < summary.loc[i, "means"]:
-                            i = j
-                            break
-                if j >= len(summary):
+                            if n == 2:
+                                s = np.std([summary.iloc[j].means, summary.iloc[i].means])
+                            else:
+                                # 参考https://stats.stackexchange.com/questions/55999/is-it-possible-to-find-the-combined-standard-deviation
+                                s = np.sqrt(((summary.iloc[j].nsamples - 1) * (summary.iloc[j].std_dev ** 2) +
+                                             (summary.iloc[i].nsamples - 1) * (summary.iloc[i].std_dev ** 2) +
+                                             summary.iloc[j].nsamples * (m - summary.iloc[j].means) ** 2 +
+                                             summary.iloc[i].nsamples * (m - summary.iloc[i].means) ** 2) / (n - 1))
+
+                            summary.loc[i, "nsamples"] = n
+                            summary.loc[i, "means"] = m
+                            summary.loc[i, "std_dev"] = s
+                            summary.loc[j, "del_flag"] = 1
+
+                            j = j + 1
+                            if j >= len(summary):
+                                break
+                            if summary.loc[j, "means"] < summary.loc[i, "means"]:
+                                i = j
+                                break
+                    if j >= len(summary):
+                        break
+                dels = np.sum(summary["del_flag"])
+                if dels == 0:
                     break
-            dels = np.sum(summary["del_flag"])
-            if dels == 0:
-                break
 
         self.bin_summary = summary.copy()
 
@@ -196,20 +240,19 @@ class Binning(BaseEstimator, TransformerMixin):
 
     def generate_bin_labels(self, row):
         left, right = np.sort([row[self.column], row[self.column + "_shift"]])
-        return pd.Interval(left, right)
+        return pd.Interval(left, right, closed=self.closed)
 
     def generate_final_dataset(self):
         shift_var = -1
-        self.bucket = True
-
         self.woe_summary[self.column + "_shift"] = self.woe_summary[self.column].shift(shift_var)
 
-        if self.sign:
-            self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = np.inf
-            self.bins = np.sort(list(self.woe_summary[self.column]) + [np.Inf, -np.Inf])
-        else:
+        if (self.sign and self.bucket) or (not self.sign and self.bucket):
             self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = -np.inf
-            self.bins = np.sort(list(self.woe_summary[self.column]) + [np.Inf, -np.Inf])
+
+        else:
+            self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = np.inf
+
+        self.bins = np.sort(list(self.woe_summary[self.column]) + [np.Inf, -np.Inf])
 
         self.woe_summary["labels"] = self.woe_summary.apply(self.generate_bin_labels, axis=1)
 
@@ -241,7 +284,8 @@ if __name__ == '__main__':
     var = "Age..years."  # variable to be binned
     y_var = "Creditability"  # the target variable
 
-    bin_object = Binning(y_var, n_threshold=train.shape[0] * 0.05, y_threshold=1, p_threshold=1, sign=False)
+    bin_object = Binning(y_var, n_threshold=train.shape[0] * 0.05, y_threshold=1, p_threshold=1, sign=False,
+                         closed='right')
     bin_object.fit(train[[y_var, var]])
 
     # Print WOE summary
