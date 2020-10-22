@@ -252,7 +252,10 @@ class Binning(BaseEstimator, TransformerMixin):
         else:
             self.woe_summary.loc[len(self.woe_summary) - 1, self.column + "_shift"] = np.inf
 
-        self.bins = np.sort(list(self.woe_summary[self.column]) + [np.Inf, -np.Inf])
+        if np.Inf not in list(self.woe_summary[self.column + "_shift"]):
+            self.bins = np.sort(list(self.woe_summary[self.column + "_shift"]) + [np.Inf])
+        else:
+            self.bins = np.sort(list(self.woe_summary[self.column + "_shift"]) + [-np.Inf])
 
         self.woe_summary["labels"] = self.woe_summary.apply(self.generate_bin_labels, axis=1)
 
